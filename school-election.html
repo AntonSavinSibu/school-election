@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School Election System</title>
+  <style>
+    :root {
+      --indigo: #4f46e5;
+      --indigo-dark: #3730a3;
+      --indigo-soft: #eef2ff;
+      --indigo-mid: #818cf8;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --green-dark: #166534;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(160deg, #eef2ff 0%, #f8fafc 50%, #f0fdf4 100%);
+      color: var(--slate-800);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .top h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+    }
+
+    .top .subtitle {
+      color: var(--slate-500);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      border-radius: 999px;
+    }
+
+    .pill-setup { background: var(--slate-100); color: var(--slate-500); }
+    .pill-open  { background: var(--green-soft); color: var(--green-dark); }
+    .pill-closed { background: var(--red-soft); color: var(--red); }
+
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 28px 26px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--slate-700);
+      margin: 18px 0 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--slate-700);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: 12px;
+      font-size: 1rem;
+      color: var(--slate-800);
+      background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      margin-bottom: 14px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    input.error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+    }
+
+    .cand-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .cand-row input {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .btn-icon {
+      width: 42px;
+      height: 42px;
+      border: none;
+      border-radius: 10px;
+      background: var(--red-soft);
+      color: var(--red);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .btn-icon:hover { background: #fecaca; }
+
+    .btn-add {
+      width: 100%;
+      padding: 11px;
+      border: 1.5px dashed var(--slate-300);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--indigo);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-bottom: 18px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn-add:hover {
+      border-color: var(--indigo);
+      background: var(--indigo-soft);
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 20px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    }
+    button:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--indigo);
+      color: #fff;
+      width: 100%;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+    }
+    .btn-primary:hover { background: var(--indigo-dark); }
+
+    .btn-danger {
+      background: var(--red);
+      color: #fff;
+      padding: 9px 16px;
+      font-size: 0.85rem;
+    }
+    .btn-danger:hover { background: #b91c1c; }
+
+    .btn-success {
+      background: var(--green);
+      color: #fff;
+      width: 100%;
+    }
+    .btn-success:hover { background: #15803d; }
+
+    .btn-gray {
+      background: var(--slate-100);
+      color: var(--slate-700);
+      width: 100%;
+      margin-top: 12px;
+    }
+    .btn-gray:hover { background: var(--slate-200); }
+
+    .error-box {
+      display: none;
+      background: var(--red-soft);
+      color: var(--red);
+      border: 1px solid #fca5a5;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .error-box.show { display: block; }
+
+    .vote-counter {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--indigo-soft);
+      color: var(--indigo);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+
+    .candidate {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid var(--slate-200);
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin: 0 0 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+    .candidate:hover {
+      border-color: var(--indigo-mid);
+      background: var(--indigo-soft);
+    }
+    .candidate.selected {
+      border-color: var(--indigo);
+      background: var(--indigo-soft);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+    .candidate input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--indigo);
+      margin: 0;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .candidate span {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--slate-800);
+    }
+
+    .success-box {
+      background: var(--green-soft);
+      border: 1.5px solid #86efac;
+      border-radius: 14px;
+      padding: 22px 20px;
+      text-align: center;
+      margin-top: 16px;
+    }
+    .success-box .icon { font-size: 2.4rem; margin-bottom: 8px; }
+    .success-box h3 {
+      color: var(--green-dark);
+      font-size: 1.15rem;
+      margin: 0 0 6px;
+    }
+    .success-box p {
+      color: var(--slate-500);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .total-banner {
+      background: linear-gradient(135deg, var(--indigo-soft), #e0e7ff);
+      border: 2px solid var(--indigo-mid);
+      border-radius: 14px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 22px;
+    }
+    .total-banner .label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--slate-500);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .total-banner .num {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--indigo);
+      line-height: 1.2;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat {
+      background: var(--slate-50);
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+    }
+    .stat .num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--slate-800);
+    }
+    .stat .label {
+      font-size: 0.78rem;
+      color: var(--slate-500);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .winner-banner {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border: 2px solid #6ee7b7;
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 22px;
+    }
+    .winner-banner h3 {
+      color: var(--green-dark);
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .result-row { margin-bottom: 18px; }
+    .result-row .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .result-row .head .votes-label {
+      color: var(--slate-500);
+      font-weight: 500;
+      font-size: 0.88rem;
+    }
+    .bar {
+      height: 22px;
+      background: var(--slate-100);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--indigo), var(--indigo-mid));
+      border-radius: 99px;
+      transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      min-width: 0;
+    }
+    .fill.winner-fill {
+      background: linear-gradient(90deg, #16a34a, #4ade80);
+    }
+    .badge-winner {
+      display: inline-block;
+      background: var(--green);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-left: 8px;
+      vertical-align: middle;
+      letter-spacing: 0.03em;
+    }
+
+    .reason-text {
+      color: var(--slate-500);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    .modal-bg.show { opacity: 1; visibility: visible; }
+
+    .modal {
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 24px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal h3 {
+      font-size: 1.2rem;
+      color: var(--slate-900);
+      margin-bottom: 8px;
+    }
+    .modal p {
+      color: var(--slate-500);
+      font-size: 0.95rem;
+      margin-bottom: 22px;
+    }
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+    }
+    .modal-btns button { flex: 1; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 560px) {
+      .wrap { padding: 18px 12px 48px; }
+      .card { padding: 22px 18px; }
+      .top h1 { font-size: 1.35rem; }
+      .stats { grid-template-columns: 1fr; }
+      .total-banner .num { font-size: 2.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="top">
+      <div>
+        <h1 id="heading">🗳️ School Election System</h1>
+        <div id="counter" class="subtitle">Set up an election to begin</div>
+      </div>
+      <div class="top-actions">
+        <span id="status" class="pill pill-setup">Setup</span>
+        <button id="endBtn" class="btn-danger hidden" type="button">End Voting</button>
+      </div>
+    </div>
+
+    <section id="setup" class="card">
+      <h2>Election Setup</h2>
+      <div id="setupError" class="error-box"></div>
+
+      <label for="electionName">Election Name</label>
+      <input id="electionName" type="text" placeholder="e.g. School Leader Election 2026" value="School Leader Election 2026" />
+
+      <label>Candidates <span style="color:var(--slate-400);font-weight:400">(min. 2)</span></label>
+      <div id="candidateInputs"></div>
+      <button type="button" class="btn-add" id="btnAdd">+ Add Candidate</button>
+
+      <label for="maxVoters">Maximum Voters</label>
+      <input id="maxVoters" type="number" min="1" max="10000" value="50" />
+
+      <button type="button" class="btn-primary" id="btnStart">Start Election</button>
+    </section>
+
+    <section id="vote" class="card hidden">
+      <div class="vote-counter" id="voteCounter">Votes: 0 / 50</div>
+      <div id="voteError" class="error-box"></div>
+
+      <label for="voterName">Your Name</label>
+      <input id="voterName" type="text" placeholder="Enter your full name" autocomplete="off" />
+
+      <h3>Choose Your Candidate</h3>
+      <div id="candidateList"></div>
+
+      <button type="button" class="btn-primary" id="btnCast">Cast Vote</button>
+      <div id="message"></div>
+    </section>
+
+    <section id="results" class="card hidden">
+      <h2>🏆 Election Results</h2>
+      <p id="reasonText" class="reason-text"></p>
+
+      <div class="total-banner">
+        <div class="label">Total Votes Cast</div>
+        <div class="num" id="totalVotesDisplay">0</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="num" id="statCast">0</div>
+          <div class="label">Votes Cast</div>
+        </div>
+        <div class="stat">
+          <div class="num" id="statMax">0</div>
+          <div class="label">Maximum</div>
+        </div>
+        <div class="stat">
+          <div class="num" id="statDidNot">0</div>
+          <div class="label">Did Not Vote</div>
+        </div>
+      </div>
+
+      <div id="winnerBox" class="winner-banner hidden"></div>
+      <div id="resultContent"></div>
+
+      <button type="button" class="btn-gray" id="btnNew">New Election</button>
+    </section>
+  </div>
+
+  <div class="modal-bg" id="modalEnd">
+    <div class="modal">
+      <h3>End Voting?</h3>
+      <p id="modalText">Are you sure you want to end the election?</p>
+      <div class="modal-btns">
+        <button type="button" class="btn-gray" id="btnCancelEnd" style="margin:0">Cancel</button>
+        <button type="button" class="btn-danger" id="btnConfirmEnd" style="width:auto;flex:1">End Voting</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var candidates = [];
+    var votes = {};
+    var total = 0;
+    var max = 50;
+    var active = false;
+    var electionTitle = '';
+
+    var $ = function (id) { return document.getElementById(id); };
+
+    function addCandidate(value) {
+      var row = document.createElement('div');
+      row.className = 'cand-row';
+
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'cand';
+      input.placeholder = 'Candidate name';
+      input.value = value || '';
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn-icon';
+      btn.title = 'Remove';
+      btn.textContent = '\u2715';
+      btn.addEventListener('click', function () {
+        var rows = document.querySelectorAll('.cand-row');
+        if (rows.length <= 2) {
+          showError('setupError', 'You need at least 2 candidates.');
+          return;
+        }
+        hideError('setupError');
+        row.remove();
+      });
+
+      row.appendChild(input);
+      row.appendChild(btn);
+      $('candidateInputs').appendChild(row);
+    }
+
+    ['Arjun', 'Anu', 'Riya', 'Rahul'].forEach(addCandidate);
+
+    function showError(id, msg) {
+      var el = $(id);
+      el.textContent = msg;
+      el.classList.add('show');
+    }
+    function hideError(id) {
+      var el = $(id);
+      el.classList.remove('show');
+      el.textContent = '';
+    }
+    function escapeHtml(s) {
+      var d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+    function setStatus(mode) {
+      var el = $('status');
+      el.className = 'pill';
+      if (mode === 'open') {
+        el.classList.add('pill-open');
+        el.textContent = 'Voting Open';
+      } else if (mode === 'closed') {
+        el.classList.add('pill-closed');
+        el.textContent = 'Voting Closed';
+      } else {
+        el.classList.add('pill-setup');
+        el.textContent = 'Setup';
+      }
+    }
+    function updateCounter() {
+      $('counter').textContent = 'Votes: ' + total + ' / ' + max;
+      var vc = $('voteCounter');
+      if (vc) vc.textContent = 'Votes: ' + total + ' / ' + max;
+    }
+
+    function startElection() {
+      hideError('setupError');
+      document.querySelectorAll('#candidateInputs input').forEach(function (el) {
+        el.classList.remove('error');
+      });
+      $('electionName').classList.remove('error');
+      $('maxVoters').classList.remove('error');
+
+      var name = ($('electionName').value || '').trim();
+      var names = [];
+      document.querySelectorAll('.cand').forEach(function (inp) {
+        var v = (inp.value || '').trim();
+        if (v) names.push(v);
+      });
+      var maxVal = parseInt($('maxVoters').value, 10);
+
+      if (!name) {
+        $('electionName').classList.add('error');
+        showError('setupError', 'Please enter an election name.');
+        $('electionName').focus();
+        return;
+      }
+      if (names.length < 2) {
+        showError('setupError', 'Please enter at least 2 candidate names.');
+        return;
+      }
+      var seen = {};
+      var dup = false;
+      names.forEach(function (n, i) {
+        var key = n.toLowerCase();
+        if (seen[key]) {
+          dup = true;
+          var inputs = document.querySelectorAll('.cand');
+          if (inputs[i]) inputs[i].classList.add('error');
+        }
+        seen[key] = true;
+      });
+      if (dup) {
+        showError('setupError', 'Candidate names must be unique.');
+        return;
+      }
+      if (!maxVal || maxVal < 1 || isNaN(maxVal)) {
+        $('maxVoters').classList.add('error');
+        showError('setupError', 'Maximum voters must be at least 1.');
+        $('maxVoters').focus();
+        return;
+      }
+
+      electionTitle = name;
+      candidates = names;
+      votes = {};
+      candidates.forEach(function (c) { votes[c] = 0; });
+      total = 0;
+      max = maxVal;
+      active = true;
+
+      $('heading').textContent = '\uD83D\uDDF3\uFE0F ' + name;
+      $('setup').classList.add('hidden');
+      $('results').classList.add('hidden');
+      $('vote').classList.remove('hidden');
+      $('endBtn').classList.remove('hidden');
+      $('message').innerHTML = '';
+      $('voterName').value = '';
+      $('voterName').disabled = false;
+      hideError('voteError');
+      setStatus('open');
+      updateCounter();
+      renderCandidates();
+    }
+
+    function renderCandidates() {
+      var list = $('candidateList');
+      list.innerHTML = '';
+      candidates.forEach(function (name, i) {
+        var label = document.createElement('label');
+        label.className = 'candidate';
+
+        var radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'candidate';
+        radio.value = i;
+
+        var span = document.createElement('span');
+        span.textContent = name;
+
+        label.appendChild(radio);
+        label.appendChild(span);
+
+        label.addEventListener('click', function () {
+          setTimeout(function () {
+            list.querySelectorAll('.candidate').forEach(function (c) {
+              c.classList.remove('selected');
+            });
+            if (radio.checked) label.classList.add('selected');
+          }, 0);
+        });
+
+        list.appendChild(label);
+      });
+    }
+
+    function castVote() {
+      if (!active) return;
+      hideError('voteError');
+
+      var voter = ($('voterName').value || '').trim();
+      var pick = document.querySelector('input[name="candidate"]:checked');
+
+      if (!voter) {
+        showError('voteError', 'Please enter your name.');
+        $('voterName').focus();
+        return;
+      }
+      if (!pick) {
+        showError('voteError', 'Please choose a candidate.');
+        return;
+      }
+
+      var idx = parseInt(pick.value, 10);
+      var chosen = candidates[idx];
+      votes[chosen]++;
+      total++;
+      updateCounter();
+
+      $('voterName').disabled = true;
+      document.querySelectorAll('input[name="candidate"]').forEach(function (r) {
+        r.disabled = true;
+      });
+
+      $('message').innerHTML =
+        '<div class="success-box">' +
+          '<div class="icon">\u2705</div>' +
+          '<h3>Vote Recorded</h3>' +
+          '<p>Thank you, <strong>' + escapeHtml(voter) + '</strong>! Your vote has been counted.</p>' +
+          '<button type="button" class="btn-success" id="btnNext">Next Voter</button>' +
+        '</div>';
+
+      $('btnNext').addEventListener('click', nextVoter);
+
+      if (total >= max) {
+        setTimeout(function () {
+          closeVoting('Maximum number of voters reached.');
+        }, 600);
+      }
+    }
+
+    function nextVoter() {
+      if (!active) return;
+      $('voterName').value = '';
+      $('voterName').disabled = false;
+      document.querySelectorAll('input[name="candidate"]').forEach(function (r) {
+        r.checked = false;
+        r.disabled = false;
+      });
+      document.querySelectorAll('.candidate').forEach(function (c) {
+        c.classList.remove('selected');
+      });
+      $('message').innerHTML = '';
+      hideError('voteError');
+      $('voterName').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openEndModal() {
+      if (!active) return;
+      var remaining = max - total;
+      $('modalText').textContent =
+        'Votes recorded: ' + total + ' / ' + max + '. ' +
+        remaining + ' voter' + (remaining !== 1 ? 's' : '') +
+        ' have not voted yet. End now?';
+      $('modalEnd').classList.add('show');
+    }
+
+    function closeEndModal() {
+      $('modalEnd').classList.remove('show');
+    }
+
+    function confirmEnd() {
+      closeEndModal();
+      closeVoting('Voting ended by the administrator.');
+    }
+
+    function closeVoting(reason) {
+      active = false;
+      $('endBtn').classList.add('hidden');
+      $('voterName').disabled = true;
+      document.querySelectorAll('input[name="candidate"]').forEach(function (r) {
+        r.disabled = true;
+      });
+      showResults(reason);
+    }
+
+    function showResults(reason) {
+      $('vote').classList.add('hidden');
+      $('results').classList.remove('hidden');
+      setStatus('closed');
+      updateCounter();
+
+      $('reasonText').textContent = reason || '';
+      $('totalVotesDisplay').textContent = total;
+      $('statCast').textContent = total;
+      $('statMax').textContent = max;
+      $('statDidNot').textContent = Math.max(0, max - total);
+
+      var high = -1;
+      candidates.forEach(function (n) {
+        if (votes[n] > high) high = votes[n];
+      });
+      var winners = candidates.filter(function (n) {
+        return votes[n] === high && high > 0;
+      });
+
+      var wBox = $('winnerBox');
+      if (winners.length === 1) {
+        wBox.innerHTML = '<h3>\uD83C\uDFC6 Winner: ' + escapeHtml(winners[0]) + '</h3>';
+        wBox.classList.remove('hidden');
+      } else if (winners.length > 1) {
+        wBox.innerHTML = '<h3>\uD83E\uDD1D Tie: ' + winners.map(escapeHtml).join(', ') + '</h3>';
+        wBox.classList.remove('hidden');
+      } else {
+        wBox.classList.add('hidden');
+      }
+
+      var sorted = candidates.slice().sort(function (a, b) {
+        return votes[b] - votes[a];
+      });
+      var html = '';
+      sorted.forEach(function (n) {
+        var count = votes[n];
+        var pct = total ? Math.round(count / total * 100) : 0;
+        var isWin = winners.indexOf(n) !== -1 && high > 0;
+        html +=
+          '<div class="result-row">' +
+            '<div class="head">' +
+              '<span>' + escapeHtml(n) +
+                (isWin ? '<span class="badge-winner">WINNER</span>' : '') +
+              '</span>' +
+              '<span class="votes-label">' + count + ' vote' + (count !== 1 ? 's' : '') + ' \u00b7 ' + pct + '%</span>' +
+            '</div>' +
+            '<div class="bar"><div class="fill' + (isWin ? ' winner-fill' : '') +
+              '" style="width:' + pct + '%"></div></div>' +
+          '</div>';
+      });
+      $('resultContent').innerHTML = html;
+    }
+
+    function resetElection() {
+      active = false;
+      total = 0;
+      candidates = [];
+      votes = {};
+      electionTitle = '';
+
+      $('results').classList.add('hidden');
+      $('vote').classList.add('hidden');
+      $('setup').classList.remove('hidden');
+      $('endBtn').classList.add('hidden');
+      $('heading').textContent = '\uD83D\uDDF3\uFE0F School Election System';
+      $('counter').textContent = 'Set up an election to begin';
+      setStatus('setup');
+      hideError('setupError');
+      hideError('voteError');
+
+      $('candidateInputs').innerHTML = '';
+      ['Arjun', 'Anu', 'Riya', 'Rahul'].forEach(addCandidate);
+      $('electionName').value = 'School Leader Election 2026';
+      $('maxVoters').value = 50;
+    }
+
+    $('btnAdd').addEventListener('click', function () {
+      addCandidate('');
+      var inputs = document.querySelectorAll('.cand');
+      if (inputs.length) inputs[inputs.length - 1].focus();
+    });
+    $('btnStart').addEventListener('click', startElection);
+    $('btnCast').addEventListener('click', castVote);
+    $('endBtn').addEventListener('click', openEndModal);
+    $('btnCancelEnd').addEventListener('click', closeEndModal);
+    $('btnConfirmEnd').addEventListener('click', confirmEnd);
+    $('btnNew').addEventListener('click', resetElection);
+
+    $('voterName').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') castVote();
+    });
+
+    $('modalEnd').addEventListener('click', function (e) {
+      if (e.target === this) closeEndModal();
+    });
+  })();
+  </script>
+</body>
+</html>
